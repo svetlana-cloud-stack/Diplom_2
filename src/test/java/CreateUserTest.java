@@ -68,11 +68,10 @@ public class CreateUserTest extends BaseApiTest {
                 .body("success", equalTo(false))
                 .body("message", equalTo("User already exists"));
     }
-
     @Test
-    @DisplayName("Создание пользователя без обязательного поля")
+    @DisplayName("Создание пользователя без email")
     @Description("Проверка ошибки при создании пользователя без email. Ожидается код ответа 403 и success=false")
-    public void createUserWithoutRequiredFieldReturnsError() {
+    public void createUserWithoutEmailReturnsError() {
         UserModel user = new UserModel(
                 null,
                 PASSWORD,
@@ -86,4 +85,41 @@ public class CreateUserTest extends BaseApiTest {
                 .body("success", equalTo(false))
                 .body("message", equalTo("Email, password and name are required fields"));
     }
+
+    @Test
+    @DisplayName("Создание пользователя без password")
+    @Description("Проверка ошибки при создании пользователя без password. Ожидается код ответа 403 и success=false")
+    public void createUserWithoutPasswordReturnsError() {
+        UserModel user = new UserModel(
+                "test" + System.currentTimeMillis() + "@mail.ru",
+                null,
+                NAME
+        );
+
+        userSteps.createUser(user)
+                .then()
+                .log().all()
+                .statusCode(HTTP_FORBIDDEN)
+                .body("success", equalTo(false))
+                .body("message", equalTo("Email, password and name are required fields"));
+    }
+
+    @Test
+    @DisplayName("Создание пользователя без name")
+    @Description("Проверка ошибки при создании пользователя без name. Ожидается код ответа 403 и success=false")
+    public void createUserWithoutNameReturnsError() {
+        UserModel user = new UserModel(
+                "test" + System.currentTimeMillis() + "@mail.ru",
+                PASSWORD,
+                null
+        );
+
+        userSteps.createUser(user)
+                .then()
+                .log().all()
+                .statusCode(HTTP_FORBIDDEN)
+                .body("success", equalTo(false))
+                .body("message", equalTo("Email, password and name are required fields"));
+    }
+
 }

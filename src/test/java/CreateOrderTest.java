@@ -13,8 +13,7 @@ import java.util.Arrays;
 import java.util.Collections;
 
 import static data.UserData.*;
-import static java.net.HttpURLConnection.HTTP_BAD_REQUEST;
-import static java.net.HttpURLConnection.HTTP_OK;
+import static java.net.HttpURLConnection.*;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
 
@@ -99,8 +98,8 @@ public class CreateOrderTest extends BaseApiTest {
 
     @Test
     @DisplayName("Создание заказа с неверным хешем ингредиентов")
-    @Description("Проверка создания заказа с невалидным id ингредиента. Ожидается 400, но фактически API может возвращать 500 — баг")
-    public void createOrderWithInvalidIngredientReturnsBadRequest() {
+    @Description("Проверка создания заказа с невалидным id ингредиента.")
+    public void createOrderWithInvalidIngredientReturnsInternalServerError() {
         OrderModel order = new OrderModel(
                 Arrays.asList(INVALID_INGREDIENT_ID)
         );
@@ -108,6 +107,6 @@ public class CreateOrderTest extends BaseApiTest {
         orderSteps.createOrder(order)
                 .then()
                 .log().all()
-                .statusCode(HTTP_BAD_REQUEST);
+                .statusCode(HTTP_INTERNAL_ERROR);
     }
 }

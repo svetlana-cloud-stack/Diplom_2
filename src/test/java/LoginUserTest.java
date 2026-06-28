@@ -42,7 +42,7 @@ public class LoginUserTest extends BaseApiTest {
     }
 
     @Test
-    @DisplayName("Успешный логин пользователя")
+    @DisplayName("Успешная авторизация пользователя")
     @Description("Проверка входа под существующим пользователем. Ожидается код ответа 200, success=true и токены в ответе")
     public void loginExistingUserSuccess() {
         UserCredentials credentials = new UserCredentials(
@@ -62,11 +62,28 @@ public class LoginUserTest extends BaseApiTest {
     }
 
     @Test
-    @DisplayName("Логин с неверным логином и паролем")
-    @Description("Проверка входа с неверными данными пользователя. Ожидается код ответа 401, success=false и сообщение об ошибке")
-    public void loginWithInvalidCredentialsReturnsError() {
+    @DisplayName("Авторизация с неверным логином")
+    @Description("Проверка входа с неверным логином. Ожидается код ответа 401, success=false и сообщение об ошибке")
+    public void loginWithInvalidLoginReturnsError() {
         UserCredentials credentials = new UserCredentials(
                 "wrong" + System.currentTimeMillis() + "@mail.ru",
+                user.getPassword()
+        );
+
+        userSteps.loginUser(credentials)
+                .then()
+                .log().all()
+                .statusCode(HTTP_UNAUTHORIZED)
+                .body("success", equalTo(false))
+                .body("message", equalTo("email or password are incorrect"));
+    }
+
+    @Test
+    @DisplayName("Авторизация с неверным паролем")
+    @Description("Проверка входа с неверным паролем. Ожидается код ответа 401, success=false и сообщение об ошибке")
+    public void loginWithInvalidPasswordReturnsError() {
+        UserCredentials credentials = new UserCredentials(
+                user.getEmail(),
                 "wrongPassword"
         );
 
@@ -77,4 +94,5 @@ public class LoginUserTest extends BaseApiTest {
                 .body("success", equalTo(false))
                 .body("message", equalTo("email or password are incorrect"));
     }
+
 }
